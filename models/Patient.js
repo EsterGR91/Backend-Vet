@@ -2,7 +2,12 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import Owner from "./Owner.js";
 
-const Patient = sequelize.define("Patient", {
+const Patient = sequelize.define("patients", {
+  id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   name: {
     type: DataTypes.STRING(120),
     allowNull: false,
@@ -25,13 +30,19 @@ const Patient = sequelize.define("Patient", {
 
 // Relación: un propietario puede tener muchas mascotas
 Owner.hasMany(Patient, {
-  foreignKey: "owner_id",
+  foreignKey: {
+    name: "owner_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
   onDelete: "SET NULL",
   onUpdate: "CASCADE",
 });
 
 Patient.belongsTo(Owner, {
-  foreignKey: "owner_id",
+  foreignKey: {
+    name: "owner_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
 });
 
 export default Patient;

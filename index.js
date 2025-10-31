@@ -5,6 +5,7 @@ import patientsRoute from "./routes/patients.js";
 import ownerRoute from "./routes/owners.js";
 import MedicalRecordRoute from "./routes/medicalrecord.js";
 import appointmentsRoute from "./routes/appointment.js";
+import authRoute from "./routes/auth.js"; 
 
 
 const app = express();
@@ -17,7 +18,7 @@ sequelize
   .catch((err) => console.error("❌ Error al conectar:", err));
 
 // 🔄 Sincronizar modelos
-sequelize.sync({ alter: false }).then(() => {
+sequelize.sync({ alter: true }).then(() => {
   console.log("🧩 Modelos sincronizados con la base de datos");
 });
 
@@ -27,6 +28,7 @@ app.get("/", (req, res) => {
 });
 
 // Rutas principales
+app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/owners", ownerRoute);
 app.use("/api/patients", patientsRoute );

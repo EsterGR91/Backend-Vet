@@ -2,7 +2,12 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import Patient from "./Patient.js";
 
-const MedicalRecord = sequelize.define("MedicalRecord", {
+const MedicalRecord = sequelize.define("medical_records", {
+  id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   record_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
@@ -14,15 +19,21 @@ const MedicalRecord = sequelize.define("MedicalRecord", {
   vet_notes: DataTypes.TEXT,
 });
 
-// Relación: una mascota puede tener muchas fichas médicas
+// Relación
 Patient.hasMany(MedicalRecord, {
-  foreignKey: "patient_id",
+  foreignKey: {
+    name: "patient_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 
 MedicalRecord.belongsTo(Patient, {
-  foreignKey: "patient_id",
+  foreignKey: {
+    name: "patient_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
 });
 
 export default MedicalRecord;

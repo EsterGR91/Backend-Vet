@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Owner = sequelize.define("Owner", {
+const Owner = sequelize.define("owners", {
   first_name: {
     type: DataTypes.STRING(80),
     allowNull: false,

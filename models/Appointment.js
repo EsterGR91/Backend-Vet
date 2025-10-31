@@ -2,7 +2,12 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import Patient from "./Patient.js";
 
-const Appointment = sequelize.define("Appointment", {
+const Appointment = sequelize.define("appointments", {
+  id: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   scheduled_for: {
     type: DataTypes.DATE,
     allowNull: false,
@@ -14,15 +19,20 @@ const Appointment = sequelize.define("Appointment", {
   notes: DataTypes.TEXT,
 });
 
-// Relación: una mascota puede tener muchas citas
 Patient.hasMany(Appointment, {
-  foreignKey: "patient_id",
+  foreignKey: {
+    name: "patient_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 
 Appointment.belongsTo(Patient, {
-  foreignKey: "patient_id",
+  foreignKey: {
+    name: "patient_id",
+    type: DataTypes.BIGINT.UNSIGNED,
+  },
 });
 
 export default Appointment;
