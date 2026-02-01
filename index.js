@@ -6,23 +6,35 @@ import ownerRoute from "./routes/owners.js";
 import MedicalRecordRoute from "./routes/medicalrecord.js";
 import appointmentsRoute from "./routes/appointment.js";
 import authRoute from "./routes/auth.js"; 
+import cors from "cors";
+
 
 
 const app = express();
 app.use(express.json());
 
-// ✅ Conectar base de datos
+app.use(
+  cors({
+    origin: "http://localhost:3001", // dominio del frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+
+
+//  Conectar base de datos
 sequelize
   .authenticate()
-  .then(() => console.log("✅ Conectado a MySQL"))
-  .catch((err) => console.error("❌ Error al conectar:", err));
+  .then(() => console.log(" Conectado a MySQL"))
+  .catch((err) => console.error(" Error al conectar:", err));
 
-// 🔄 Sincronizar modelos
+//  Sincronizar modelos
 sequelize.sync({ alter: true }).then(() => {
   console.log("🧩 Modelos sincronizados con la base de datos");
 });
 
-// 📍 Ruta básica
+//  Ruta básica
 app.get("/", (req, res) => {
   res.json({ msg: "API del Sistema Veterinario funcionando 🚀" });
 });
