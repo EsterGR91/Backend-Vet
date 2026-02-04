@@ -1,28 +1,40 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const User = sequelize.define("users", {
-  full_name: {
-    type: DataTypes.STRING(120),
-    allowNull: false,
+const User = sequelize.define(
+  "User",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    full_name: {
+      type: DataTypes.STRING(120),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(190),
+      allowNull: false,
+      unique: true,
+    },
+    password_hash: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.ENUM("ADMIN", "STAFF"),
+      defaultValue: "STAFF",
+    },
+    is_active: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1,
+    },
   },
-  email: {
-    type: DataTypes.STRING(190),
-    allowNull: false,
-    unique: true,
-  },
-  password_hash: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.ENUM("ADMIN", "STAFF"),
-    defaultValue: "STAFF",
-  },
-  is_active: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
-  },
-});
+  {
+    tableName: "users",
+    timestamps: true,   // 👈 ESTO ES CLAVE
+  }
+);
 
 export default User;

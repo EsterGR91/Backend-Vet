@@ -1,50 +1,48 @@
 import express from "express";
 import sequelize from "./config/db.js";
-import userRoute from "./routes/user.js";
-import patientsRoute from "./routes/patients.js";
-import ownerRoute from "./routes/owners.js";
-import MedicalRecordRoute from "./routes/medicalrecord.js";
-import appointmentsRoute from "./routes/appointment.js";
-import authRoute from "./routes/auth.js"; 
 import cors from "cors";
 
-
+import authRoute from "./routes/auth.js";
+import userRoute from "./routes/user.js";
+import ownerRoute from "./routes/owners.js";
+import patientsRoute from "./routes/patients.js";
+import medicalRecordRoute from "./routes/medicalrecord.js";
+import appointmentsRoute from "./routes/appointment.js";
 
 const app = express();
 app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:3001", // dominio del frontend
+    origin: "http://localhost:3001",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
-
-
-//  Conectar base de datos
+// DB
 sequelize
   .authenticate()
-  .then(() => console.log(" Conectado a MySQL"))
-  .catch((err) => console.error(" Error al conectar:", err));
+  .then(() => console.log("✅ Conectado a MySQL"))
+  .catch((err) => console.error("❌ Error DB:", err));
 
-//  Sincronizar modelos
-sequelize.sync({ alter: true }).then(() => {
-  console.log("🧩 Modelos sincronizados con la base de datos");
+sequelize.sync({ alter: false }).then(() => {
+  console.log("🧩 Modelos sincronizados");
 });
 
-//  Ruta básica
+// Test
 app.get("/", (req, res) => {
-  res.json({ msg: "API del Sistema Veterinario funcionando 🚀" });
+  res.json({ msg: "API funcionando 🚀" });
 });
 
-// Rutas principales
+// ROUTES
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/owners", ownerRoute);
-app.use("/api/patients", patientsRoute );
-app.use("/api/records", MedicalRecordRoute);
-app.use("/api/appointments", appointmentsRoute );
+app.use("/api/patients", patientsRoute);
+app.use("/api/records", medicalRecordRoute);
+app.use("/api/appointments", appointmentsRoute);
 
-app.listen(3000, () => console.log("🌍 Servidor corriendo en http://localhost:3000"));
+app.listen(3000, () =>
+  console.log("🌍 Server http://localhost:3000")
+);
