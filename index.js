@@ -1,37 +1,33 @@
 import express from "express";
 import cors from "cors";
-import connectDB from "./config/db.js";
 
-// Routes
+// routes
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
-import ownersRoutes from "./routes/owners.js";
-import patientsRoutes from "./routes/patients.js";
-import medicalRecordRoutes from "./routes/medicalrecord.js";
+import ownerRoutes from "./routes/owners.js";
+import patientRoutes from "./routes/patients.js";
 import appointmentRoutes from "./routes/appointment.js";
+import medicalRecordRoutes from "./routes/medicalrecord.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// MongoDB
-connectDB();
-
-// Test
-app.get("/api", (req, res) => {
-  res.json({ msg: "API funcionando 🚀" });
+// 🔍 test rápido
+app.get("/", (req, res) => {
+  res.send("API Backend Vet funcionando 🚀");
 });
 
-// Routes
+// ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/owners", ownersRoutes);
-app.use("/api/patients", patientsRoutes);
-app.use("/api/records", medicalRecordRoutes);
+app.use("/api/owners", ownerRoutes);
+app.use("/api/patients", patientRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/medicalrecords", medicalRecordRoutes); // 👈 ESTA ES LA CLAVE
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () =>
-  console.log(`🌍 Server running on port ${PORT}`)
-);
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
