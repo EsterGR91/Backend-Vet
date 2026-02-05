@@ -4,7 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/users.js";
+import userRoutes from "./routes/user.js";
 
 const app = express();
 
