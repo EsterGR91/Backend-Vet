@@ -10,13 +10,9 @@ router.post("/login", async (req, res) => {
     const email = req.body.email?.toLowerCase().trim();
     const password = req.body.password;
 
-    if (!email || !password) {
-      return res.status(400).json({ msg: "Datos incompletos" });
-    }
+    const user = await User.findOne({ email }).select("+password");
 
-    const user = await User.findOne({ email });
-
-    if (!user || !user.password) {
+    if (!user) {
       return res.status(401).json({ msg: "Credenciales inválidas" });
     }
 
@@ -42,11 +38,8 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error("LOGIN ERROR:", err);
-    res.status(500).json({ msg: "Error interno del servidor" });
+    res.status(500).json({ msg: "Error interno" });
   }
 });
 
-
 export default router;
-
-
