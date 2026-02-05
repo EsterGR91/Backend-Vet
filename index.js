@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 
-// Routes
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import ownersRoutes from "./routes/owners.js";
@@ -12,18 +11,23 @@ import appointmentRoutes from "./routes/appointment.js";
 
 const app = express();
 
-app.use(cors());
+/* 🔥 CORS CORRECTO */
+app.use(
+  cors({
+    origin: "*", // para desarrollo
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 
-// MongoDB
 connectDB();
 
-// Test
 app.get("/api", (req, res) => {
   res.json({ msg: "API funcionando 🚀" });
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/owners", ownersRoutes);
