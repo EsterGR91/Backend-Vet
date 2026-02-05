@@ -11,49 +11,30 @@ import appointmentsRoute from "./routes/appointment.js";
 
 const app = express();
 
-// ✅ PUERTO PARA CPANEL (OBLIGATORIO)
+// 🔹 Render usa este puerto
 const PORT = process.env.PORT || 3000;
 
-// ==================
 // MIDDLEWARES
-// ==================
 app.use(express.json());
 
 app.use(
   cors({
-    origin: "*", // SOLO para pruebas
+    origin: "*", // luego lo cerramos
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
-// ==================
-// DB
-// ==================
-sequelize
-  .authenticate()
-  .then(() => console.log("✅ Conectado a MySQL"))
-  .catch((err) => console.error("❌ Error DB:", err));
-
-sequelize.sync({ alter: false }).then(() => {
-  console.log("🧩 Modelos sincronizados");
-});
-
-// ==================
-// ENDPOINTS DE PRUEBA
-// ==================
-
-// 🔴 ESTE ERA EL QUE FALTABA
+// 🔹 Endpoint raíz (OBLIGATORIO para Render)
 app.get("/", (req, res) => {
-  res.json({ msg: "API viva en cPanel 🚀" });
+  res.json({ status: "API MEGRDIGITAL OK 🚀" });
 });
 
+// 🔹 Endpoint de prueba API
 app.get("/api", (req, res) => {
-  res.json({ msg: "API funcionando correctamente 🚀" });
+  res.json({ msg: "API funcionando 🚀" });
 });
 
-// ==================
 // ROUTES
-// ==================
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/owners", ownerRoute);
@@ -61,10 +42,17 @@ app.use("/api/patients", patientsRoute);
 app.use("/api/records", medicalRecordRoute);
 app.use("/api/appointments", appointmentsRoute);
 
-// ==================
-// START SERVER
-// ==================
-app.listen(PORT, () => {
-  console.log(`🌍 Server corriendo en puerto ${PORT}`);
+// DB
+sequelize
+  .authenticate()
+  .then(() => console.log("✅ Conectado a DB"))
+  .catch((err) => console.error("❌ Error DB:", err));
+
+sequelize.sync({ alter: false }).then(() => {
+  console.log("🧩 Modelos sincronizados");
 });
 
+// 🔹 IMPORTANTE: escuchar en 0.0.0.0
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🌍 Server corriendo en puerto ${PORT}`);
+});
