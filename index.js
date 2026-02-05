@@ -11,35 +11,49 @@ import appointmentsRoute from "./routes/appointment.js";
 
 const app = express();
 
-//  PUERTO PARA CPANEL
+// ✅ PUERTO PARA CPANEL (OBLIGATORIO)
 const PORT = process.env.PORT || 3000;
 
+// ==================
 // MIDDLEWARES
+// ==================
 app.use(express.json());
 
 app.use(
   cors({
-    origin: "*", // luego lo cerramos, ahora es para probar
+    origin: "*", // SOLO para pruebas
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
+// ==================
 // DB
+// ==================
 sequelize
   .authenticate()
   .then(() => console.log("✅ Conectado a MySQL"))
   .catch((err) => console.error("❌ Error DB:", err));
 
 sequelize.sync({ alter: false }).then(() => {
-  console.log(" Modelos sincronizados");
+  console.log("🧩 Modelos sincronizados");
 });
 
-// ✅ ENDPOINT DE PRUEBA (IMPORTANTE)
+// ==================
+// ENDPOINTS DE PRUEBA
+// ==================
+
+// 🔴 ESTE ERA EL QUE FALTABA
+app.get("/", (req, res) => {
+  res.json({ msg: "API viva en cPanel 🚀" });
+});
+
 app.get("/api", (req, res) => {
-  res.json({ msg: "API funcionando 🚀" });
+  res.json({ msg: "API funcionando correctamente 🚀" });
 });
 
+// ==================
 // ROUTES
+// ==================
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/owners", ownerRoute);
@@ -47,7 +61,9 @@ app.use("/api/patients", patientsRoute);
 app.use("/api/records", medicalRecordRoute);
 app.use("/api/appointments", appointmentsRoute);
 
+// ==================
 // START SERVER
+// ==================
 app.listen(PORT, () => {
   console.log(`🌍 Server corriendo en puerto ${PORT}`);
 });
