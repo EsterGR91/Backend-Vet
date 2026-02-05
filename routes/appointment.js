@@ -1,39 +1,96 @@
+
 import express from "express";
 import Appointment from "../models/Appointment.js";
-import Patient from "../models/Patient.js";
 
 const router = express.Router();
 
-// Listar citas
+// ===============================
+// LISTAR CITAS
+// ===============================
 router.get("/", async (req, res) => {
-  const appointments = await Appointment.findAll({ include: Patient });
-  res.json(appointments);
+  try {
+    const appointments = await Appointment
+      .find()
+      .populate("patient"); // 👈 MongoDB reemplaza "include"
+
+    res.json(appointments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener citas" });
+  }
 });
 
-// Obtener una cita
+// ===============================
+// OBTENER UNA CITA
+// ===============================
 router.get("/:id", async (req, res) => {
-  const appointment = await Appointment.findByPk(req.params.id, { include: Patient });
-  appointment ? res.json(appointment) : res.status(404).json({ msg: "Cita no encontrada" });
+  try {
+    const appointment = await Appointment
+      .findById(req.params.id)
+      .populate("patient");
+
+    if (!appointment) {
+      return res.status(404).json({ msg: "Cita no encontrada" });
+    }
+
+    res.json(appointment);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "ID inválido" });
+  }
 });
 
-// Crear cita
+// ===============================
+// CREAR CITA
+// ===============================
 router.post("/", async (req, res) => {
-  const appointment = await Appointment.create(req.body);
-  res.json(appointment);
+  try {
+    const appointment = await Appointment.create(req.body);
+    res.status(201).json(appointment);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al crear cita" });
+  }
 });
 
-// Actualizar cita
+// ===============================
+// ACTUALIZAR CITA
+// ===============================
 router.put("/:id", async (req, res) => {
-  const appointment = await Appointment.findByPk(req.params.id);
-  if (!appointment) return res.status(404).json({ msg: "Cita no encontrada" });
-  await appointment.update(req.body);
-  res.json(appointment);
+  try {
+    const appointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ msg: "Cita no encontrada" });
+    }
+
+    res.json(appointment);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al actualizar cita" });
+  }
 });
 
-// Eliminar cita
+// ===============================
+// ELIMINAR CITA
+// ===============================
 router.delete("/:id", async (req, res) => {
-  const deleted = await Appointment.destroy({ where: { id: req.params.id } });
-  res.json({ deleted });
+  try {
+    const deleted = await Appointment.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ msg: "Cita no encontrada" });
+    }
+
+    res.json({ msg: "Cita eliminada correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al eliminar cita" });
+  }
 });
 
 export default router;

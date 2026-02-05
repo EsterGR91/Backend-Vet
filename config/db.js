@@ -1,10 +1,13 @@
-import { Sequelize } from "sequelize";
+import mongoose from "mongoose";
 
-const sequelize = new Sequelize("vet_system", "root", "", {
-  host: "localhost",
-  port: 3306, // Laragon usa 3306 para MySQL, aunque el servidor web esté en 80
-  dialect: "mysql",
-  logging: false,
-});
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("✅ MongoDB conectado");
+  } catch (error) {
+    console.error("❌ Error MongoDB:", error.message);
+    process.exit(1);
+  }
+};
 
-export default sequelize;
+export default connectDB;

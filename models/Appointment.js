@@ -1,38 +1,22 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
-import Patient from "./Patient.js";
+import mongoose from "mongoose";
 
-const Appointment = sequelize.define("appointments", {
-  id: {
-    type: DataTypes.BIGINT.UNSIGNED,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  scheduled_for: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.ENUM("PENDING", "COMPLETED", "CANCELLED"),
-    defaultValue: "PENDING",
-  },
-  notes: DataTypes.TEXT,
-});
+const AppointmentSchema = new mongoose.Schema(
+  {
+    scheduled_for: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: ["PENDING", "COMPLETED", "CANCELLED"],
+      default: "PENDING",
+    },
+    notes: String,
 
-Patient.hasMany(Appointment, {
-  foreignKey: {
-    name: "patient_id",
-    type: DataTypes.BIGINT.UNSIGNED,
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      required: true,
+    },
   },
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
+  { timestamps: true }
+);
 
-Appointment.belongsTo(Patient, {
-  foreignKey: {
-    name: "patient_id",
-    type: DataTypes.BIGINT.UNSIGNED,
-  },
-});
-
-export default Appointment;
+export default mongoose.model("Appointment", AppointmentSchema);

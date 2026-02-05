@@ -1,58 +1,37 @@
 import express from "express";
-import sequelize from "./config/db.js";
 import cors from "cors";
+import connectDB from "./config/db.js";
 
-import authRoute from "./routes/auth.js";
-import userRoute from "./routes/user.js";
-import ownerRoute from "./routes/owners.js";
-import patientsRoute from "./routes/patients.js";
-import medicalRecordRoute from "./routes/medicalrecord.js";
-import appointmentsRoute from "./routes/appointment.js";
+// Routes
+import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
+import ownersRoutes from "./routes/owners.js";
+import patientsRoutes from "./routes/patients.js";
+import medicalRecordRoutes from "./routes/medicalrecord.js";
+import appointmentRoutes from "./routes/appointment.js";
 
 const app = express();
 
-// 🔹 Render usa este puerto
-const PORT = process.env.PORT || 3000;
-
-// MIDDLEWARES
+app.use(cors());
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: "*", // luego lo cerramos
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  })
-);
+// MongoDB
+connectDB();
 
-// 🔹 Endpoint raíz (OBLIGATORIO para Render)
-app.get("/", (req, res) => {
-  res.json({ status: "API MEGRDIGITAL OK 🚀" });
-});
-
-// 🔹 Endpoint de prueba API
+// Test
 app.get("/api", (req, res) => {
   res.json({ msg: "API funcionando 🚀" });
 });
 
-// ROUTES
-app.use("/api/auth", authRoute);
-app.use("/api/users", userRoute);
-app.use("/api/owners", ownerRoute);
-app.use("/api/patients", patientsRoute);
-app.use("/api/records", medicalRecordRoute);
-app.use("/api/appointments", appointmentsRoute);
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/owners", ownersRoutes);
+app.use("/api/patients", patientsRoutes);
+app.use("/api/records", medicalRecordRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
-// DB
-sequelize
-  .authenticate()
-  .then(() => console.log("✅ Conectado a DB"))
-  .catch((err) => console.error("❌ Error DB:", err));
-
-sequelize.sync({ alter: false }).then(() => {
-  console.log("🧩 Modelos sincronizados");
-});
-
-// 🔹 IMPORTANTE: escuchar en 0.0.0.0
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🌍 Server corriendo en puerto ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`🌍 Server running on port ${PORT}`)
+);

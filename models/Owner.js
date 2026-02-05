@@ -1,22 +1,16 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import mongoose from "mongoose";
 
-const Owner = sequelize.define("owners", {
-  first_name: {
-    type: DataTypes.STRING(80),
-    allowNull: false,
+const OwnerSchema = new mongoose.Schema(
+  {
+    first_name: { type: String, required: true, maxlength: 80 },
+    last_name: { type: String, required: true, maxlength: 120 },
+    email: { type: String, unique: true },
+    phone: String,
+    address: String,
+    notes: String,
   },
-  last_name: {
-    type: DataTypes.STRING(120),
-    allowNull: false,
-  },
-  email: {
-    type: DataTypes.STRING(190),
-    unique: true,
-  },
-  phone: DataTypes.STRING(40),
-  address: DataTypes.STRING(255),
-  notes: DataTypes.TEXT,
-});
+  { timestamps: true }
+);
 
-export default Owner;
+export default mongoose.model("Owner", OwnerSchema);
+

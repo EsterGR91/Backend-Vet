@@ -1,39 +1,21 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
-import Patient from "./Patient.js";
+import mongoose from "mongoose";
 
-const MedicalRecord = sequelize.define("medical_records", {
-  id: {
-    type: DataTypes.BIGINT.UNSIGNED,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  record_date: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-  reason: DataTypes.STRING(200),
-  symptoms: DataTypes.TEXT,
-  diagnosis: DataTypes.TEXT,
-  treatment: DataTypes.TEXT,
-  vet_notes: DataTypes.TEXT,
-});
+const MedicalRecordSchema = new mongoose.Schema(
+  {
+    record_date: { type: Date, default: Date.now },
+    reason: String,
+    symptoms: String,
+    diagnosis: String,
+    treatment: String,
+    vet_notes: String,
 
-// Relación
-Patient.hasMany(MedicalRecord, {
-  foreignKey: {
-    name: "patient_id",
-    type: DataTypes.BIGINT.UNSIGNED,
+    patient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      required: true,
+    },
   },
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
+  { timestamps: true }
+);
 
-MedicalRecord.belongsTo(Patient, {
-  foreignKey: {
-    name: "patient_id",
-    type: DataTypes.BIGINT.UNSIGNED,
-  },
-});
-
-export default MedicalRecord;
+export default mongoose.model("MedicalRecord", MedicalRecordSchema);

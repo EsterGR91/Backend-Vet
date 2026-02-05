@@ -1,39 +1,96 @@
 import express from "express";
 import MedicalRecord from "../models/MedicalRecord.js";
-import Patient from "../models/Patient.js";
 
 const router = express.Router();
 
-// Listar fichas médicas
+// ===============================
+// LISTAR FICHAS MÉDICAS
+// ===============================
 router.get("/", async (req, res) => {
-  const records = await MedicalRecord.findAll({ include: Patient });
-  res.json(records);
+  try {
+    const records = await MedicalRecord
+      .find()
+      .populate("patient"); // 👈 reemplaza include
+
+    res.json(records);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener fichas médicas" });
+  }
 });
 
-// Obtener una ficha
+// ===============================
+// OBTENER UNA FICHA
+// ===============================
 router.get("/:id", async (req, res) => {
-  const record = await MedicalRecord.findByPk(req.params.id, { include: Patient });
-  record ? res.json(record) : res.status(404).json({ msg: "Ficha no encontrada" });
+  try {
+    const record = await MedicalRecord
+      .findById(req.params.id)
+      .populate("patient");
+
+    if (!record) {
+      return res.status(404).json({ msg: "Ficha no encontrada" });
+    }
+
+    res.json(record);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "ID inválido" });
+  }
 });
 
-// Crear ficha
+// ===============================
+// CREAR FICHA
+// ===============================
 router.post("/", async (req, res) => {
-  const record = await MedicalRecord.create(req.body);
-  res.json(record);
+  try {
+    const record = await MedicalRecord.create(req.body);
+    res.status(201).json(record);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al crear ficha médica" });
+  }
 });
 
-// Actualizar ficha
+// ===============================
+// ACTUALIZAR FICHA
+// ===============================
 router.put("/:id", async (req, res) => {
-  const record = await MedicalRecord.findByPk(req.params.id);
-  if (!record) return res.status(404).json({ msg: "Ficha no encontrada" });
-  await record.update(req.body);
-  res.json(record);
+  try {
+    const record = await MedicalRecord.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (!record) {
+      return res.status(404).json({ msg: "Ficha no encontrada" });
+    }
+
+    res.json(record);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al actualizar ficha médica" });
+  }
 });
 
-// Eliminar ficha
+// ===============================
+// ELIMINAR FICHA
+// ===============================
 router.delete("/:id", async (req, res) => {
-  const deleted = await MedicalRecord.destroy({ where: { id: req.params.id } });
-  res.json({ deleted });
+  try {
+    const deleted = await MedicalRecord.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ msg: "Ficha no encontrada" });
+    }
+
+    res.json({ msg: "Ficha eliminada correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al eliminar ficha médica" });
+  }
 });
 
 export default router;
+

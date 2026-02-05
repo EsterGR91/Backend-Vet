@@ -3,36 +3,94 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// Obtener todos
+// ===============================
+// OBTENER TODOS LOS USUARIOS
+// ===============================
 router.get("/", async (req, res) => {
-  const users = await User.findAll();
-  res.json(users);
+  try {
+    const users = await User.find().select("-password_hash"); // no enviar password
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener usuarios" });
+  }
 });
 
-// Obtener uno
+// ===============================
+// OBTENER UN USUARIO
+// ===============================
 router.get("/:id", async (req, res) => {
-  const user = await User.findByPk(req.params.id);
-  user ? res.json(user) : res.status(404).json({ msg: "Usuario no encontrado" });
+  try {
+    const user = await User.findById(req.params.id).select("-password_hash");
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "ID inválido" });
+  }
 });
 
-// Crear
+// ===============================
+// CREAR USUARIO
+// ===============================
 router.post("/", async (req, res) => {
-  const user = await User.create(req.body);
-  res.json(user);
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json({
+      id: user._id,
+      full_name: user.full_name,
+      email: user.email,
+      role: user.role,
+      is_active: user.is_active,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al crear usuario" });
+  }
 });
 
-// Actualizar
+// ===============================
+// ACTUALIZAR USUARIO
+// ===============================
 router.put("/:id", async (req, res) => {
-  const user = await User.findByPk(req.params.id);
-  if (!user) return res.status(404).json({ msg: "Usuario no encontrado" });
-  await user.update(req.body);
-  res.json(user);
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    ).select("-password_hash");
+
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al actualizar usuario" });
+  }
 });
 
-// Eliminar
+// ===============================
+// ELIMINAR USUARIO
+// ===============================
 router.delete("/:id", async (req, res) => {
-  const deleted = await User.destroy({ where: { id: req.params.id } });
-  res.json({ deleted });
+  try {
+    const deleted = await User.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.json({ msg: "Usuario eliminado correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ msg: "Error al eliminar usuario" });
+  }
 });
 
 export default router;
