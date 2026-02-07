@@ -1,10 +1,10 @@
-
 import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 
 const router = express.Router();
 
+// REGISTRO
 router.post("/", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -13,27 +13,23 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ msg: "Datos incompletos" });
     }
 
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ email: email.toLowerCase() });
     if (exists) {
-      return res.status(400).json({ msg: "Email ya registrado" });
+      return res.status(400).json({ msg: "Usuario ya existe" });
     }
-
-    // 🔐 ENCRIPTAR AQUÍ (SIN EXCUSAS)
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = new User({
       name,
-      email,
-      password: hashedPassword,
+      email: email.toLowerCase(),
+      password, // 🔐 se encripta SOLO
     });
 
     await user.save();
 
     res.status(201).json({ msg: "Usuario creado correctamente" });
-  } catch (err) {
-    console.error("REGISTER ERROR:", err);
-    res.status(500).json({ msg: "Error al registrar usuario" });
+  } catch (error) {
+    console.error("REGISTER ERROR:", error);
+    res.status(500).json({ msg: "Error interno" });
   }
 });
 
