@@ -1,7 +1,9 @@
 import express from "express";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import User from "../models/User.js";
+import bcrypt from "bcryptjs/dist/bcrypt.js";
+
 
 const router = express.Router();
 
@@ -11,48 +13,37 @@ const router = express.Router();
  */
 router.post("/login", async (req, res) => {
   try {
-    const rawEmail = req.body?.email;
-    const password = req.body?.password;
+    const email = String(req.body?.email || "").toLowerCase().trim();
+    const password = String(req.body?.password || "");
 
-    // Validación básica
-    if (typeof rawEmail !== "string" || typeof password !== "string") {
-      return res.status(400).json({ msg: "Datos incompletos" });
-    }
-
-    const email = rawEmail.toLowerCase().trim();
     if (!email || !password) {
       return res.status(400).json({ msg: "Datos incompletos" });
     }
 
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ msg: "JWT_SECRET no configurado" });
+      console.error("LOGIN ERROR: JWT_SECRET no configurado");
+      return res.status(500).json({ msg: "Error interno del servidor" });
     }
 
-    // Buscar usuario por email y traer el hash (si está select:false)
-    const user = await User.findOne({ email }).select("+password_hash");
+    // Debug (puedes quitarlo luego)
+    
+    const user = await User.findOne({ email }).select("+password");
+    
 
-    // Recomendación de seguridad: mensaje genérico para no filtrar si existe el email
     if (!user) {
       return res.status(401).json({ msg: "Credenciales inválidas" });
     }
 
-    // Usuario activo
     if (user.is_active === false) {
       return res.status(403).json({ msg: "Usuario deshabilitado" });
     }
 
-    // Si por alguna razón no existe hash (usuario legacy / corrupción)
-    if (!user.password_hash) {
-      return res.status(401).json({ msg: "Credenciales inválidas" });
-    }
-
-    // Comparar password plano vs hash
-    const ok = await bcrypt.compare(password, user.password_hash);
+    const ok = await bcrypt.compare(password, user.password);
+    console.log(ok)
     if (!ok) {
       return res.status(401).json({ msg: "Credenciales inválidas" });
     }
 
-    // Crear JWT
     const token = jwt.sign(
       { id: user._id.toString(), role: user.role },
       process.env.JWT_SECRET,

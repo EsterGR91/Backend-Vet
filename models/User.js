@@ -1,39 +1,24 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-
+    full_name: { type: String, required: true },
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
       trim: true,
+      index: true,
     },
-
-    password: {
-      type: String,
-      required: true,
-    },
-
-    role: {
-      type: String,
-      default: "user",
-    },
+    password: { type: String, required: true, select: false },
+    role: { type: String, enum: ["STAFF", "ADMIN"], default: "STAFF" },
+    is_active: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
 
-/* 🔐 ENCRIPTAR ANTES DE GUARDAR */
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// Evita recompilar el modelo en hot-reload / tests
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-
-  next();
-});
-
-export default mongoose.model("User", userSchema);
+export default User;
